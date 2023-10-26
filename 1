@@ -1,0 +1,35 @@
+DELIMITER //
+
+CREATE TRIGGER after_insert_cliente
+AFTER INSERT ON Clientes
+FOR EACH ROW
+BEGIN
+    INSERT INTO Auditoria ( Mensagem,data_hora)
+    VALUES (CONCAT('Novo cliente inserido: ', NEW.nome, '. Data e hora da inserção: ', NOW()), NOW());
+END;
+//
+CREATE TRIGGER before_delete_cliente
+BEFORE DELETE ON Clientes
+FOR EACH ROW
+BEGIN
+    INSERT INTO Auditoria (mensagem)
+    VALUES (CONCAT('Tentativa de excluir cliente: ', OLD.nome, '. Data e hora da tentativa: ', NOW()), NOW());
+END;
+//
+
+CREATE TRIGGER after_update_cliente
+AFTER UPDATE ON Clientes
+FOR EACH ROW
+BEGIN
+    IF NEW.nome IS NULL OR NEW.nome = ' THEN
+        INSERT INTO Auditoria (mensagem, data_hora)
+        VALUES (CONCAt('Tentativa de atualizar nome para valor nulo ou vazio. Data e hora da tentativa: ', NOW(), NOW());
+        SET NEW.nome = OLD.nome;
+    ELSE
+        INSERT INTO Auditoria (, data_hora)
+        VALUES (CONCAT('Nome do cliente atualizado de ', OLD.nome, ' para ', NEW.nome, '. Data e hora da atualização: ', NOW()), NOW());
+    END IF;
+END;
+//
+
+DELIMITER ;
